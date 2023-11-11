@@ -3,9 +3,7 @@ package com.bank.bank.domain.service.impl;
 import com.bank.bank.application.exception.NotFoundException;
 import com.bank.bank.domain.mapper.Mapper;
 import com.bank.bank.domain.model.Account;
-import com.bank.bank.domain.model.Client;
 import com.bank.bank.domain.model.Transaction;
-import com.bank.bank.domain.model.TransactionType;
 import com.bank.bank.domain.service.AccountService;
 import com.bank.bank.domain.service.ClientService;
 import com.bank.bank.infrastructure.dto.request.CreateAccountRequest;
@@ -83,16 +81,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public BigDecimal calculateBalance(Long accountId) {
-        Account account = accountRepository.findByAccountNumber(accountId).orElseThrow(() -> new NotFoundException("Account with accountNumber " + accountId + " not found"));
+        Account account = accountRepository.findByAccountNumber(accountId)
+                .orElseThrow(() -> new NotFoundException("Account with accountNumber " + accountId + " not found"));
         BigDecimal balance = account.getInitialBalance();
-        for (Transaction transaction : account.getTransactions()) {
-            if (transaction.getTransactionType() == TransactionType.DEPOSIT) {
-                balance = balance.add(transaction.getValue());
-            } else if (transaction.getTransactionType() == TransactionType.WITHDRAWAL) {
-                balance = balance.subtract(transaction.getValue());
-            }
-        }
-        return balance;
+        BigDecimal total = account.getTransactions().stream()
+                .map(Transaction::getValue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return balance.add(total);
     }
 
     @Override

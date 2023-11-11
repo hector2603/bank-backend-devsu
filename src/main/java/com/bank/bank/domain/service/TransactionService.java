@@ -1,14 +1,14 @@
 package com.bank.bank.domain.service;
 
-import com.bank.bank.domain.model.Transaction;
 import com.bank.bank.infrastructure.dto.request.CreateTransactionRequest;
+import com.bank.bank.infrastructure.dto.response.TransactionResponse;
 
 import java.util.List;
 
 public interface TransactionService {
-    Transaction createTransaction(CreateTransactionRequest request);
-    Transaction updateTransaction(Long id, CreateTransactionRequest request);
-    Transaction getTransaction(Long id);
-    List<Transaction> getAllTransactions();
+    TransactionResponse createTransaction(CreateTransactionRequest request);
+    TransactionResponse updateTransaction(Long id, CreateTransactionRequest request);
+    TransactionResponse getTransaction(Long id);
+    List<TransactionResponse> getAllTransactions();
     void deleteTransaction(Long id);
 }

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://ep-orange-water-78030098-pooler.us-east-1.postgres.vercel-storage.com/verceldb
+    url: jdbc:postgresql://ep-orange-water-78030098-pooler.us-east-1.postgres.vercel-storage.com/verceldb?prepareThreshold=0
     username: default
     password: aCVFp1fISX4M
   jpa:
@@ -10,3 +10,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+daily:
+  withdrawal:
+    limit: 1000

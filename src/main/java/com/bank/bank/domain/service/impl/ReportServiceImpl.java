@@ -1,13 +1,16 @@
-package com.bank.bank.domain.service;
+package com.bank.bank.domain.service.impl;
 
+import com.bank.bank.domain.mapper.Mapper;
 import com.bank.bank.domain.model.Account;
 import com.bank.bank.domain.model.Report;
 import com.bank.bank.domain.model.Transaction;
 import com.bank.bank.domain.model.TransactionType;
+import com.bank.bank.domain.service.AccountService;
+import com.bank.bank.domain.service.ReportService;
+import com.bank.bank.infrastructure.dto.response.AccountResponse;
+import com.itextpdf.text.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.ByteArrayOutputStream;
@@ -23,7 +26,7 @@ public class ReportServiceImpl implements ReportService {
     private AccountService accountService;
 
     @Autowired
-    private TransactionService transactionService;
+    private Mapper mapper;
 
     @Override
     public Report generateAccountStatementReport(Long clientId, LocalDate startDate, LocalDate endDate) {
@@ -38,6 +41,7 @@ public class ReportServiceImpl implements ReportService {
                     .stream()
                     .filter(transaction -> !transaction.getCreationDate().isBefore(startDateTime) && !transaction.getCreationDate().isAfter(endDateTime))
                     .toList();
+            account.setTransactions(transactions);
             for (Transaction transaction : transactions) {
                 if (transaction.getTransactionType() == TransactionType.DEPOSIT) {
                     totalCredits = totalCredits.add(transaction.getValue());
@@ -48,7 +52,7 @@ public class ReportServiceImpl implements ReportService {
         }
 
         Report report = new Report();
-        report.setAccounts(accounts);
+        report.setAccounts(accounts.stream().map(mapper::mapToResponse).toList());
         report.setTotalDebits(totalDebits);
         report.setTotalCredits(totalCredits);
 
@@ -62,9 +66,30 @@ public class ReportServiceImpl implements ReportService {
             Document document = new Document();
             PdfWriter.getInstance(document, outputStream);
             document.open();
-            document.add(new Paragraph("Accounts: " + report.getAccounts()));
-            document.add(new Paragraph("Total Debits: " + report.getTotalDebits()));
-            document.add(new Paragraph("Total Credits: " + report.getTotalCredits()));
+
+            // Define custom fonts
+            Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+            Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
+
+            // Add title
+            Paragraph title = new Paragraph("Account Statement Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            // Add a line break
+            document.add(Chunk.NEWLINE);
+
+            // Add content
+            document.add(new Paragraph("Accounts: ", titleFont));
+            for (AccountResponse account : report.getAccounts()) {
+                document.add(new Paragraph("Account ID: " + account.getId(), normalFont));
+                document.add(new Paragraph("Account Balance: " + account.getBalance(), normalFont));
+                document.add(new Paragraph("Account Client ID: " + account.getClientId(), normalFont));
+                document.add(Chunk.NEWLINE);
+            }
+            document.add(new Paragraph("Total Debits: " + report.getTotalDebits(), titleFont));
+            document.add(new Paragraph("Total Credits: " + report.getTotalCredits(), titleFont));
+
             document.close();
             return outputStream.toByteArray();
         } catch (Exception e) {

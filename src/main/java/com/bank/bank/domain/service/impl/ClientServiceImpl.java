@@ -28,6 +28,10 @@ public class ClientServiceImpl implements ClientService {
         return Optional.of(request)
                 .map(client -> updateClientDetails(new Client(), client))
                 .map(clientRepository::save)
+                .map(client -> {
+                    client.setAccounts(List.of());
+                    return client;
+                })
                 .map(mapper::mapToResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request"));
     }
