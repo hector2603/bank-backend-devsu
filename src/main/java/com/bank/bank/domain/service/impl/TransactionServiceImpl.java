@@ -39,7 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse createTransaction(CreateTransactionRequest request) {
         return Optional.of(request)
-                .map(req -> accountService.getAccount(req.getAccountId()))
+                .map(req -> accountService.getAccount(req.getAccountNumber()))
                 .map(account -> validateTransaction(request, account))
                 .map(account -> createTransactionData(request, account))
                 .map(transactionRepository::save)
@@ -54,7 +54,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(req -> transactionRepository.findById(id)
                         .orElseThrow(() -> new NotFoundException("Transaction with id " + id + " not found")))
                 .map(transaction -> {
-                    AccountResponse account = accountService.getAccount(request.getAccountId());
+                    AccountResponse account = accountService.getAccount(request.getAccountNumber());
                     validateTransaction(request, account);
                     transaction.setAccount(mapper.convertToAccountEntity(account));
                     transaction.setTransactionType(request.getTransactionType());

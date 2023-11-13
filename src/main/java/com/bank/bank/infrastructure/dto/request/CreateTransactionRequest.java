@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 public class CreateTransactionRequest {
     @NotNull(message = "Account id is mandatory")
-    private Long accountId;
+    private Long accountNumber;
     @NotNull(message = "Transaction type is mandatory")
     private TransactionType transactionType;
     @NotNull(message = "Value is mandatory")

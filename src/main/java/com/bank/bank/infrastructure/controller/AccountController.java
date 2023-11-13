@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/accounts")
 @Tag(name = "Account Controller", description = "Controller to manage the accounts")
+@CrossOrigin(origins = {"http://localhost:4200/"}, allowedHeaders = "*")
 public class AccountController {
 
     @Autowired

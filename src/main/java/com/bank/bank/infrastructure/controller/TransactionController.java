@@ -17,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/transactions")
 @Tag(name = "Transaction Management", description = "Operations pertaining to transaction in Transaction Management System")
+@CrossOrigin(origins = {"http://localhost:4200/"}, allowedHeaders = "*")
 public class TransactionController {
 
     @Autowired
@@ -24,30 +25,30 @@ public class TransactionController {
 
     @PostMapping
     @Operation(summary = "Create a new transaction", description = "Create a new transaction", tags = { "Transaction Management" })
-    public ResponseEntity<TransactionResponse> createTransaction(@RequestBody CreateTransactionRequest request) {
+    public ResponseEntity<WrapperResponse<TransactionResponse>> createTransaction(@RequestBody CreateTransactionRequest request) {
         TransactionResponse transaction = transactionService.createTransaction(request);
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.ok(new WrapperResponse<>(transaction,null));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @Operation(summary = "Update an existing transaction", description = "Update an existing transaction", tags = { "Transaction Management" })
-    public ResponseEntity<TransactionResponse> updateTransaction(@PathVariable Long id, @RequestBody CreateTransactionRequest request) {
+    public ResponseEntity<WrapperResponse<TransactionResponse>> updateTransaction(@PathVariable Long id, @RequestBody CreateTransactionRequest request) {
         TransactionResponse transaction = transactionService.updateTransaction(id, request);
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.ok(new WrapperResponse<>(transaction,null));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a transaction by id", description = "Get a transaction by id", tags = { "Transaction Management" })
-    public ResponseEntity<TransactionResponse> getTransaction(@PathVariable Long id) {
+    public ResponseEntity<WrapperResponse<TransactionResponse>> getTransaction(@PathVariable Long id) {
         TransactionResponse transaction = transactionService.getTransaction(id);
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.ok(new WrapperResponse<>(transaction,null));
     }
 
     @GetMapping
     @Operation(summary = "Get all transactions", description = "Get all transactions", tags = { "Transaction Management" })
-    public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
+    public ResponseEntity<WrapperResponse<List<TransactionResponse>>> getAllTransactions() {
         List<TransactionResponse> transactions = transactionService.getAllTransactions();
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.ok(new WrapperResponse<>(transactions,null));
     }
 
     @DeleteMapping("/{id}")

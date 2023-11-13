@@ -29,7 +29,6 @@ public class CreateClientRequest {
     @NotBlank(message = "Phone is mandatory")
     private String phone;
 
-    @NotBlank(message = "Password is mandatory")
     private String password;
 
     @NotNull(message = "Status is mandatory")
